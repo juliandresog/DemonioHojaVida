@@ -12,12 +12,18 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
@@ -50,6 +56,44 @@ public class ProcesadorMain {
     protected static final String KEY_SOFT_SKILLS = "Soft skills";
     protected static final String KEY_WORK_EXPERIENCE = "Work Experience";
 
+    private static final Map<String, String> mapHabilidadesBlandas;
+    private static final Map<String, String> mapHabilidadesTecnicas;
+
+    //inicializo variables
+    static {
+        mapHabilidadesBlandas = new LinkedHashMap<>();
+        mapHabilidadesTecnicas = new HashMap<>();
+
+        List<String> palabrasClave = new ArrayList<>();
+        palabrasClave.add("Creative thinking".toLowerCase());
+        palabrasClave.add("Curtomer management".toLowerCase());
+        palabrasClave.add("Leadership".toLowerCase());
+        palabrasClave.add("Self learning".toLowerCase());
+        palabrasClave.add("Project Management".toLowerCase());
+
+        for (String palabra : palabrasClave) {
+            mapHabilidadesBlandas.put(palabra, palabra);
+        }
+
+//        palabrasClave.clear();
+//        palabrasClave.add("Angular".toLowerCase());
+//        palabrasClave.add("Sql".toLowerCase());
+//        palabrasClave.add("C#".toLowerCase());
+//        palabrasClave.add("Visual Basic".toLowerCase());
+//        palabrasClave.add("JavaScript".toLowerCase());
+//        palabrasClave.add("Node".toLowerCase());
+//        palabrasClave.add("C++".toLowerCase());
+//        palabrasClave.add("Python".toLowerCase());
+//        palabrasClave.add("AWS".toLowerCase());
+//        palabrasClave.add("GCP".toLowerCase());
+//        palabrasClave.add("RPA".toLowerCase());
+//        palabrasClave.add("Tensorflow".toLowerCase());
+//
+//        for (String palabra : palabrasClave) {
+//            mapHabilidadesTecnicas.put(palabra, palabra);
+//        }
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -66,9 +110,11 @@ public class ProcesadorMain {
 
             String csvFile = carpetaSalida + "csv_generado_" + new Date().getTime() + ".csv";
             FileWriter writer = new FileWriter(csvFile);
-            CSVUtils.writeLine(writer, Arrays.asList("NombreCandidato", "Email", "Telefono", "Residencia", "Edad", "ExperienciaTI", "Carrera", 
-                    "Universidad", "Perfil", "HabilidadTecnica", "HabilidadTecnicaValor", "InglesConocimiento", "InglesVerbal", "InglesEscrito", 
-                    "HabilidadesBlandas", "ExperienciaLaboral", "EstadoCandidato"), ',', '"');
+            CSVUtils.writeLine(writer, Arrays.asList("NombreCandidato", "Email", "Telefono", "Residencia", "Edad", "ExperienciaTI", "Carrera",
+                    "Universidad", "Perfil", "HabilidadTecnica", "HabilidadTecnicaValor", "InglesConocimiento", "InglesVerbal", "InglesEscrito",
+                    //"HabilidadesBlandas", 
+                    "Creative thinking", "Curtomer management", "Leadership", "Self learning", "Project Management",
+                    "ExperienciaLaboral", "EstadoCandidato"), ',', '"');
 
             File folder = new File(carpetaPlanos);
             File[] listOfFiles = folder.listFiles();
@@ -81,30 +127,38 @@ public class ProcesadorMain {
                     Map<String, Object> persona = procesarDocumento(leerArchivo(listOfFiles[i]));
                     //System.out.println("Persona: " + persona);
                     if (persona != null) {
-                        if (persona.containsKey("habilidades_tecnicas") && persona.get("habilidades_tecnicas") != null && !((Map) persona.get("habilidades_tecnicas")).isEmpty()) {
+                        if (persona.containsKey("habilidades_tecnicas")
+                                && persona.get("habilidades_tecnicas") != null
+                                && !((Map) persona.get("habilidades_tecnicas")).isEmpty()) {
                             //debo repetir los registros segun las habilidades tecnicas del candidato
                             Iterator it = ((Map) persona.get("habilidades_tecnicas")).entrySet().iterator();
+
                             while (it.hasNext()) {
                                 Map.Entry pair = (Map.Entry) it.next();
                                 CSVUtils.writeLine(writer, Arrays.asList(
-                                    persona.get("nombre_candidato").toString(),
-                                    persona.get("email").toString(),
-                                    persona.get("telefono").toString(),
-                                    persona.get("residencia").toString(),
-                                    persona.get("edad").toString(),
-                                    persona.get("experiencia_ti").toString(),
-                                    persona.get("carrera").toString(),
-                                    persona.get("universidad").toString(),
-                                    persona.get("perfil").toString(),
-                                    pair.getKey().toString(),
-                                    pair.getValue().toString(),
-                                    persona.get("ingles_conocimiento").toString(),
-                                    persona.get("ingles_verbal").toString(),
-                                    persona.get("ingles_escrito").toString(),
-                                    persona.get("habilidades_blandas").toString(),
-                                    persona.get("experiencia_laboral").toString(),
-                                    persona.get("candidato_estado").toString())
-                                , ',', '"');
+                                        persona.get("nombre_candidato").toString(),
+                                        persona.get("email").toString(),
+                                        persona.get("telefono").toString(),
+                                        persona.get("residencia").toString(),
+                                        persona.get("edad").toString(),
+                                        persona.get("experiencia_ti").toString(),
+                                        persona.get("carrera").toString(),
+                                        persona.get("universidad").toString(),
+                                        persona.get("perfil").toString(),
+                                        pair.getKey().toString(),
+                                        pair.getValue().toString(),
+                                        persona.get("ingles_conocimiento").toString(),
+                                        persona.get("ingles_verbal").toString(),
+                                        persona.get("ingles_escrito").toString(),
+                                        //persona.get("habilidades_blandas").toString(),
+                                        persona.get("habilidades_blandas_creativethinking").toString(),
+                                        persona.get("habilidades_blandas_curtomermanagement").toString(),
+                                        persona.get("habilidades_blandas_leadership").toString(),
+                                        persona.get("habilidades_blandas_selflearning").toString(),
+                                        persona.get("habilidades_blandas_proyectmanagement").toString(),
+                                        persona.get("experiencia_laboral").toString(),
+                                        persona.get("candidato_estado").toString()),
+                                        ',', '"');
                             }
                         } else {
                             CSVUtils.writeLine(writer, Arrays.asList(
@@ -122,14 +176,19 @@ public class ProcesadorMain {
                                     persona.get("ingles_conocimiento").toString(),
                                     persona.get("ingles_verbal").toString(),
                                     persona.get("ingles_escrito").toString(),
-                                    persona.get("habilidades_blandas").toString(),
+                                    //persona.get("habilidades_blandas").toString(),
+                                    persona.get("habilidades_blandas_creativethinking").toString(),
+                                    persona.get("habilidades_blandas_curtomermanagement").toString(),
+                                    persona.get("habilidades_blandas_leadership").toString(),
+                                    persona.get("habilidades_blandas_selflearning").toString(),
+                                    persona.get("habilidades_blandas_proyectmanagement").toString(),
                                     persona.get("experiencia_laboral").toString(),
-                                    persona.get("candidato_estado").toString())
-                            , ',', '"');
+                                    persona.get("candidato_estado").toString()),
+                                    ',', '"');
                         }
-                        
+
                         //muevo el archivo que ya se procesó
-                        FileUtils.moveFile(listOfFiles[i], new File(carpetaSalida+listOfFiles[i].getName()));
+                        FileUtils.moveFile(listOfFiles[i], new File(carpetaSalida + listOfFiles[i].getName()));
                     }
                 } else if (listOfFiles[i].isDirectory()) {
                     System.out.println("Directory " + listOfFiles[i].getName());
@@ -159,7 +218,7 @@ public class ProcesadorMain {
             String line = (String) it.next();
             txt.append(line).append("\n");
         }
-        
+
         it.close();
 
         return txt.toString();
@@ -177,6 +236,7 @@ public class ProcesadorMain {
         int nroLinea = 0;
         String linea;
         String lineaB;
+        String lineaAux;
         int ciclomaximo = 500;
         int ciclo = 0;
         while (tokens.hasMoreTokens()) {
@@ -252,8 +312,16 @@ public class ProcesadorMain {
                     while (!linea.trim().startsWith(KEY_ENGLISH_LANGUAGE_EXTRA1) && ciclo < ciclomaximo) {
                         if (!linea.trim().startsWith(KEY_PROGRAMING) && !linea.trim().isEmpty()) {//ignoro la linea donde dice: programming languages
                             //a veces la informacion de la habilidad esta en una sola linea en otras esta en la linea siguiente
+                            //tambien en algunos en una sola linea hay varias habilidades calificadas
                             if (Character.isDigit(linea.trim().charAt(linea.trim().length() - 1))) {
-                                habilidades.put(linea.trim().replace(linea.trim().charAt(linea.trim().length() - 1) + "", ""), linea.trim().charAt(linea.trim().length() - 1) + "");
+                                //uso expresion regular por si hay varias habilidades en la linea
+                                Pattern p = Pattern.compile("[a-zA-Z#\\s\\+]+\\s\\d+");
+                                Matcher m = p.matcher(linea.trim());
+                                while (m.find()) {
+                                    //System.out.println(m.group());
+                                    lineaAux = m.group();
+                                    habilidades.put(lineaAux.trim().replace(lineaAux.trim().charAt(lineaAux.trim().length() - 1) + "", ""), lineaAux.trim().charAt(lineaAux.trim().length() - 1) + "");
+                                }
                             } else {
                                 if (tokens.hasMoreTokens() && !linea.trim().isEmpty()) {
                                     lineaB = tokens.nextToken();
@@ -298,14 +366,60 @@ public class ProcesadorMain {
                 }
 
                 if (linea.trim().startsWith(KEY_SOFT_SKILLS)) {//Bloque con las habilidades que tiene el candidato
-                    StringBuilder habilidadesBlandas = new StringBuilder();
-                    habilidadesBlandas.append(linea.trim().replace(KEY_SOFT_SKILLS, "").trim());
+//                    List<String> habilidades = new ArrayList<>();
+//                    habilidades.addAll(buscarHabilidades(linea.trim().replace(KEY_SOFT_SKILLS, "").trim()));
+                    //StringBuilder habilidadesBlandas = new StringBuilder();
+                    //habilidadesBlandas.append(linea.trim().replace(KEY_SOFT_SKILLS, "").trim());
+                    linea = linea.trim().replace(KEY_SOFT_SKILLS, "").trim();
+                    //"Creative thinking", "Curtomer management", "Leadership", "Self learning", "Project Management"
+                    persona.put("habilidades_blandas_creativethinking", 0);
+                    persona.put("habilidades_blandas_curtomermanagement", 0);
+                    persona.put("habilidades_blandas_leadership", 0);
+                    persona.put("habilidades_blandas_selflearning", 0);
+                    persona.put("habilidades_blandas_proyectmanagement", 0);
+
+                    if (linea.trim().toLowerCase().contains("Creative thinking".toLowerCase())) {
+                        persona.put("habilidades_blandas_creativethinking", 1);
+                    }
+                    if (linea.trim().toLowerCase().contains("Curtomer management".toLowerCase())) {
+                        persona.put("habilidades_blandas_curtomermanagement", 1);
+                    }
+                    if (linea.trim().toLowerCase().contains("Leadership".toLowerCase())) {
+                        persona.put("habilidades_blandas_leadership", 1);
+                    }
+                    if (linea.trim().toLowerCase().contains("Self learning".toLowerCase())) {
+                        persona.put("habilidades_blandas_selflearning", 1);
+                    }
+                    if (linea.trim().toLowerCase().contains("Project Management".toLowerCase())) {
+                        persona.put("habilidades_blandas_proyectmanagement", 1);
+                    }
+
                     if (tokens.hasMoreTokens()) {
                         linea = tokens.nextToken();
                     }
                     ciclo = 0;
+
+                    //leo las demas lineas
                     while (!linea.trim().startsWith(KEY_WORK_EXPERIENCE) && ciclo < ciclomaximo) {
-                        habilidadesBlandas.append(" ").append(linea).append(",");
+                        if (!linea.trim().isEmpty()) {
+                            //habilidadesBlandas.append(" ").append(linea).append(",");
+                            //habilidades.addAll(buscarHabilidades(linea.trim()));
+                            if (linea.trim().toLowerCase().contains("Creative thinking".toLowerCase())) {
+                                persona.put("habilidades_blandas_creativethinking", 1);
+                            }
+                            if (linea.trim().toLowerCase().contains("Curtomer management".toLowerCase())) {
+                                persona.put("habilidades_blandas_curtomermanagement", 1);
+                            }
+                            if (linea.trim().toLowerCase().contains("Leadership".toLowerCase())) {
+                                persona.put("habilidades_blandas_leadership", 1);
+                            }
+                            if (linea.trim().toLowerCase().contains("Self learning".toLowerCase())) {
+                                persona.put("habilidades_blandas_selflearning", 1);
+                            }
+                            if (linea.trim().toLowerCase().contains("Project Management".toLowerCase())) {
+                                persona.put("habilidades_blandas_proyectmanagement", 1);
+                            }
+                        }
                         if (tokens.hasMoreTokens()) {
                             linea = tokens.nextToken();
                         }
@@ -314,10 +428,10 @@ public class ProcesadorMain {
                     if (ciclo >= ciclomaximo) {
                         System.err.println("Error en ciclo de habilidades blandas");
                     }
-                    persona.put("habilidades_blandas", habilidadesBlandas.toString());
+                    //persona.put("habilidades_blandas", habilidades);
                 }
 
-                if (linea.trim().startsWith(KEY_WORK_EXPERIENCE)) {//Bloque con las habilidades que tiene el candidato
+                if (linea.trim().startsWith(KEY_WORK_EXPERIENCE)) {//Bloque con la experiencia del candidato
                     StringBuilder experienciaLaboral = new StringBuilder();
                     experienciaLaboral.append(linea.trim().replace(KEY_WORK_EXPERIENCE, "").trim());
                     if (tokens.hasMoreTokens()) {
@@ -325,7 +439,9 @@ public class ProcesadorMain {
                     }
                     ciclo = 0;
                     while (!linea.trim().startsWith(KEY_APPROVED) && !linea.trim().startsWith(KEY_REJECTED) && ciclo < ciclomaximo) {
-                        experienciaLaboral.append(" ").append(linea).append(",");
+                        if (!linea.trim().isEmpty()) {
+                            experienciaLaboral.append(" ").append(linea).append(",");
+                        }
                         if (tokens.hasMoreTokens()) {
                             linea = tokens.nextToken();
                         }
@@ -349,6 +465,24 @@ public class ProcesadorMain {
         }
 
         return persona;
+    }
+
+    /**
+     * Buscar habilidades blandas del mapa "Creative thinking", "Curtomer
+     * management", "Leadership", "Self learning", "Project Management",
+     *
+     * @param txtHabilidades
+     * @return
+     */
+    private static Collection<String> buscarHabilidades(String txtHabilidades) {
+        Collection<String> retorno = new ArrayList<>();
+        Collection<String> lista = mapHabilidadesBlandas.values();
+        for (String valor : lista) {
+            if (txtHabilidades.contains(valor.toLowerCase())) {
+                retorno.add(valor);
+            }
+        }
+        return retorno;
     }
 
 }
