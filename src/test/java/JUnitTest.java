@@ -4,6 +4,9 @@
  * and open the template in the editor.
  */
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.After;
@@ -39,12 +42,27 @@ public class JUnitTest {
     }
 
     @Test
-    public void Regex1() {
+    public void Regex1() throws IOException {
         Pattern p = Pattern.compile("[a-zA-Z#\\s\\+]+\\s\\d+");
         Matcher m = p.matcher("C# 5 Sql 3 C++ 5 Visual Basic 4 AWS 4");
         
         System.out.println("Buscando...");
 
+        FileWriter writer = new FileWriter("C:\\RPA\\hv_plano\\demo.txt", true);
+        writer.append("Algo para escribir");
+        writer.flush();
+        writer.close();
+        
+        // APPEND MODE SET HERE
+        BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\RPA\\hv_plano\\demo2.txt", true));
+	 bw.write("400:08311998:Inprise Corporation:249.95");
+	 bw.newLine();
+         bw.write("400:08311998:Inprise Corporation:249.95");
+	 bw.newLine();
+	 bw.flush();
+         
+         bw.close();
+            
         //System.out.println(":"+m.groupCount());
         while (m.find()) {
             System.out.println(m.group());

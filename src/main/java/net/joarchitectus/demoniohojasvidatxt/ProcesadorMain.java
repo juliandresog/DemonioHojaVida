@@ -109,12 +109,16 @@ public class ProcesadorMain {
             }
 
             String csvFile = carpetaSalida + "csv_generado_" + new Date().getTime() + ".csv";
-            FileWriter writer = new FileWriter(csvFile);
-            CSVUtils.writeLine(writer, Arrays.asList("NombreCandidato", "Email", "Telefono", "Residencia", "Edad", "ExperienciaTI", "Carrera",
-                    "Universidad", "Perfil", "HabilidadTecnica", "HabilidadTecnicaValor", "InglesConocimiento", "InglesVerbal", "InglesEscrito",
-                    //"HabilidadesBlandas", 
+            FileWriter writer = new FileWriter(csvFile, true);
+            CSVUtils.writeLine(writer, Arrays.asList(
+                    "NombreCandidato", "Email", "Residencia", 
+                    "Carrera", "Universidad", "Telefono",  "Edad", "ExperienciaTI", 
+                    "InglesConocimiento", "InglesVerbal", "InglesEscrito",
                     "Creative thinking", "Curtomer management", "Leadership", "Self learning", "Project Management",
-                    "ExperienciaLaboral", "EstadoCandidato"), ',', '"');
+                    "ExperienciaLaboral", "EstadoCandidato", 
+                    "Perfil", 
+                    "Angular", "AWS", "C#", "C++", "GCP", "JavaScript", "Node", "Python", "RPA", "Sql", "Tensorflow", "Visual Basic"                  
+                ), ',', '"');
 
             File folder = new File(carpetaPlanos);
             File[] listOfFiles = folder.listFiles();
@@ -127,65 +131,53 @@ public class ProcesadorMain {
                     Map<String, Object> persona = procesarDocumento(leerArchivo(listOfFiles[i]));
                     //System.out.println("Persona: " + persona);
                     if (persona != null) {
-                        if (persona.containsKey("habilidades_tecnicas")
-                                && persona.get("habilidades_tecnicas") != null
-                                && !((Map) persona.get("habilidades_tecnicas")).isEmpty()) {
+//                        if (persona.containsKey("habilidades_tecnicas")
+//                                && persona.get("habilidades_tecnicas") != null
+//                                && !((Map) persona.get("habilidades_tecnicas")).isEmpty()) {
                             //debo repetir los registros segun las habilidades tecnicas del candidato
-                            Iterator it = ((Map) persona.get("habilidades_tecnicas")).entrySet().iterator();
+                            //Iterator it = ((Map) persona.get("habilidades_tecnicas")).entrySet().iterator();
+                            Map<String, String> habilidadesTec = ((Map) persona.get("habilidades_tecnicas"));
 
-                            while (it.hasNext()) {
-                                Map.Entry pair = (Map.Entry) it.next();
+//                            while (it.hasNext()) {
+//                                Map.Entry pair = (Map.Entry) it.next();
                                 CSVUtils.writeLine(writer, Arrays.asList(
                                         persona.get("nombre_candidato").toString(),
                                         persona.get("email").toString(),
-                                        persona.get("telefono").toString(),
                                         persona.get("residencia").toString(),
-                                        persona.get("edad").toString(),
-                                        persona.get("experiencia_ti").toString(),
                                         persona.get("carrera").toString(),
                                         persona.get("universidad").toString(),
-                                        persona.get("perfil").toString(),
-                                        pair.getKey().toString(),
-                                        pair.getValue().toString(),
+                                        persona.get("telefono").toString(),                                        
+                                        persona.get("edad").toString(),
+                                        persona.get("experiencia_ti").toString(),
                                         persona.get("ingles_conocimiento").toString(),
                                         persona.get("ingles_verbal").toString(),
                                         persona.get("ingles_escrito").toString(),
-                                        //persona.get("habilidades_blandas").toString(),
                                         persona.get("habilidades_blandas_creativethinking").toString(),
                                         persona.get("habilidades_blandas_curtomermanagement").toString(),
                                         persona.get("habilidades_blandas_leadership").toString(),
                                         persona.get("habilidades_blandas_selflearning").toString(),
                                         persona.get("habilidades_blandas_proyectmanagement").toString(),
                                         persona.get("experiencia_laboral").toString(),
-                                        persona.get("candidato_estado").toString()),
-                                        ',', '"');
-                            }
-                        } else {
-                            CSVUtils.writeLine(writer, Arrays.asList(
-                                    persona.get("nombre_candidato").toString(),
-                                    persona.get("email").toString(),
-                                    persona.get("telefono").toString(),
-                                    persona.get("residencia").toString(),
-                                    persona.get("edad").toString(),
-                                    persona.get("experiencia_ti").toString(),
-                                    persona.get("carrera").toString(),
-                                    persona.get("universidad").toString(),
-                                    persona.get("perfil").toString(),
-                                    "",
-                                    "",
-                                    persona.get("ingles_conocimiento").toString(),
-                                    persona.get("ingles_verbal").toString(),
-                                    persona.get("ingles_escrito").toString(),
-                                    //persona.get("habilidades_blandas").toString(),
-                                    persona.get("habilidades_blandas_creativethinking").toString(),
-                                    persona.get("habilidades_blandas_curtomermanagement").toString(),
-                                    persona.get("habilidades_blandas_leadership").toString(),
-                                    persona.get("habilidades_blandas_selflearning").toString(),
-                                    persona.get("habilidades_blandas_proyectmanagement").toString(),
-                                    persona.get("experiencia_laboral").toString(),
-                                    persona.get("candidato_estado").toString()),
-                                    ',', '"');
-                        }
+                                        persona.get("candidato_estado").toString(),
+                                        persona.get("perfil").toString(),          
+                                        habilidadesTec.containsKey("Angular") ? habilidadesTec.get("Angular") : "",
+                                        habilidadesTec.containsKey("AWS") ? habilidadesTec.get("AWS") : "",
+                                        habilidadesTec.containsKey("C#") ? habilidadesTec.get("C#") : "",
+                                        habilidadesTec.containsKey("C++") ? habilidadesTec.get("C++") : "",
+                                        habilidadesTec.containsKey("GCP") ? habilidadesTec.get("GCP") : "",
+                                        habilidadesTec.containsKey("JavaScript") ? habilidadesTec.get("JavaScript") : "",
+                                        habilidadesTec.containsKey("Node") ? habilidadesTec.get("Node") : "",
+                                        habilidadesTec.containsKey("Python") ? habilidadesTec.get("Python") : "",
+                                        habilidadesTec.containsKey("RPA") ? habilidadesTec.get("RPA") : "",
+                                        habilidadesTec.containsKey("Sql") ? habilidadesTec.get("Sql") : "",
+                                        habilidadesTec.containsKey("Tensorflow") ? habilidadesTec.get("Tensorflow") : "",
+                                        habilidadesTec.containsKey("Visual Basic") ? habilidadesTec.get("Visual Basic") : ""
+//                                        pair.getKey().toString(),
+//                                        pair.getValue().toString()                                        
+                                        //persona.get("habilidades_blandas").toString(),
+                                    ), ',', '"');
+//                            }
+//                        }
 
                         //muevo el archivo que ya se procesó
                         File dest = new File(carpetaSalida + listOfFiles[i].getName());
@@ -200,6 +192,9 @@ public class ProcesadorMain {
 
                 System.out.println((i + 1) + "/" + listOfFiles.length);
             }
+            
+            writer.flush();
+            writer.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
