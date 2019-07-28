@@ -188,7 +188,11 @@ public class ProcesadorMain {
                         }
 
                         //muevo el archivo que ya se procesó
-                        FileUtils.moveFile(listOfFiles[i], new File(carpetaSalida + listOfFiles[i].getName()));
+                        File dest = new File(carpetaSalida + listOfFiles[i].getName());
+                        if(dest.exists()){
+                            dest.delete();
+                        }
+                        FileUtils.moveFile(listOfFiles[i], dest);
                     }
                 } else if (listOfFiles[i].isDirectory()) {
                     System.out.println("Directory " + listOfFiles[i].getName());
