@@ -48,7 +48,7 @@ public class JUnitTest {
         
         System.out.println("Buscando...");
 
-        FileWriter writer = new FileWriter("C:\\RPA\\hv_plano\\demo.txt", true);
+        /*FileWriter writer = new FileWriter("C:\\RPA\\hv_plano\\demo.txt", true);
         writer.append("Algo para escribir");
         writer.flush();
         writer.close();
@@ -61,7 +61,7 @@ public class JUnitTest {
 	 bw.newLine();
 	 bw.flush();
          
-         bw.close();
+         bw.close();*/
             
         //System.out.println(":"+m.groupCount());
         while (m.find()) {
