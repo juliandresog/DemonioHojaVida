@@ -103,14 +103,13 @@ public class ProcesadorMain {
             System.out.println("Argumentos: " + args);
             String carpetaPlanos = "C:\\RPA\\hv_plano\\";
             String carpetaSalida = "C:\\RPA\\hv_salida\\";
+            String carpetaPreprocesado = "C:\\RPA\\hv_preprocesado\\";
             //miro si me mandaron el nombre de la carpeta por argumento
             if (args != null && args.length == 1) {
                 carpetaPlanos = args[0];
             }
-
-            String csvFile = carpetaSalida + "csv_generado_" + new Date().getTime() + ".csv";
-            FileWriter writer = new FileWriter(csvFile, true);
-            CSVUtils.writeLine(writer, Arrays.asList(
+            
+            List<String> titulos = Arrays.asList(
                     "NombreCandidato", "Email", "Residencia", 
                     "Carrera", "Universidad", "Telefono",  "Edad", "ExperienciaTI", 
                     "InglesConocimiento", "InglesVerbal", "InglesEscrito",
@@ -118,13 +117,22 @@ public class ProcesadorMain {
                     "ExperienciaLaboral", "EstadoCandidato", 
                     "Perfil", 
                     "Angular", "AWS", "C#", "C++", "GCP", "JavaScript", "Node", "Python", "RPA", "Sql", "Tensorflow", "Visual Basic"                  
-                ), ',', '"');
+                );
+
+            //String csvFile = carpetaSalida + "csv_generado_" + new Date().getTime() + ".csv";
+            String csvFile = carpetaSalida + "csv_generado_final.csv";
+            FileWriter writer = new FileWriter(csvFile, true);
+            CSVUtils.writeLine(writer, titulos, ',', '"');
 
             File folder = new File(carpetaPlanos);
             File[] listOfFiles = folder.listFiles();
             for (int i = 0; i < listOfFiles.length; i++) {
                 //for (int i = 0; i < 2; i++) {
                 if (listOfFiles[i].isFile() && listOfFiles[i].getName().endsWith("txt")) {
+                    String csvFileIndividual = carpetaPreprocesado + listOfFiles[i].getName().replace("txt", "csv");
+                    FileWriter writerIndividual = new FileWriter(csvFileIndividual, true);
+                    CSVUtils.writeLine(writerIndividual, titulos, ',', '"');
+            
                     //System.out.println("************************************");
                     //System.out.println(listOfFiles[i].getName());
 
@@ -140,7 +148,7 @@ public class ProcesadorMain {
 
 //                            while (it.hasNext()) {
 //                                Map.Entry pair = (Map.Entry) it.next();
-                                CSVUtils.writeLine(writer, Arrays.asList(
+                                List<String> datos = Arrays.asList(
                                         persona.get("nombre_candidato").toString(),
                                         persona.get("email").toString(),
                                         persona.get("residencia").toString(),
@@ -175,7 +183,14 @@ public class ProcesadorMain {
 //                                        pair.getKey().toString(),
 //                                        pair.getValue().toString()                                        
                                         //persona.get("habilidades_blandas").toString(),
-                                    ), ',', '"');
+                                    );
+
+                                //linea para global
+                                CSVUtils.writeLine(writer, datos, ',', '"');
+                                //linea para individual
+                                CSVUtils.writeLine(writerIndividual, datos, ',', '"');
+                                writerIndividual.flush();
+                                writerIndividual.close();
 //                            }
 //                        }
 
