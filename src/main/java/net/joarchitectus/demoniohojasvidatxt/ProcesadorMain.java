@@ -190,7 +190,7 @@ public class ProcesadorMain {
                                 //linea para individual
                                 CSVUtils.writeLine(writerIndividual, datos, ',', '"');
                                 writerIndividual.flush();
-                                writerIndividual.close();
+                                writerIndividual.close(); 
 //                            }
 //                        }
 
